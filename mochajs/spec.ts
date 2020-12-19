@@ -1,54 +1,34 @@
-import {browser, $, $$, ExpectedConditions as EC, element, By} from 'protractor'
+import {browser} from 'protractor'
+import {HomePage} from './pages/homePage'
 import {expect} from 'chai'
 import {testData} from '../testData'
 
+
 describe('Films', function () {
 
-    beforeEach(function(){
+    const homepage = new HomePage();
+
+    beforeEach( async function(){
         browser.waitForAngularEnabled(false);
+        await homepage.openPage();
     });
 
     it('Verify top rated movie',  async function () {
-        browser.get('/');
-        let topRatedFilm = $$('movie-card').get(0);
-    
-        let nameOfTopRatedFilm = await topRatedFilm.$('.caption h4').getText();
 
-        let releaseDateOfTopRatedFilm = await topRatedFilm.$('.caption h4+p').getText();
-        releaseDateOfTopRatedFilm = releaseDateOfTopRatedFilm.split(' ')[2];
+        let topRatedFilm = await homepage.getTopRatedFilm();
 
-        let rateOfTopRatedFilm = await topRatedFilm.$('.caption p+p small').getText();
-
-        expect(nameOfTopRatedFilm).equal(testData.topRatedFilm.filmName);
-        expect(releaseDateOfTopRatedFilm).equal(testData.topRatedFilm.releaseDate);
-        expect(rateOfTopRatedFilm).equal(testData.topRatedFilm.filmRate);
+        expect(topRatedFilm.nameOfTopRatedFilm).equal(testData.topRatedFilm.filmName);
+        expect(topRatedFilm.releaseDateOfTopRatedFilm).equal(testData.topRatedFilm.releaseDate);
+        expect(topRatedFilm.rateOfTopRatedFilm).equal(testData.topRatedFilm.filmRate);
     });
 
     it('Search for specific movie', async function(){
-        let inputElem = $(`.jumbotron [name='searchStr']`);
-        let searchButton = $(`.jumbotron button`);
 
-        browser.get('/');
+        await homepage.searchFor(testData.searchFilmData.filmName);
+        let foundFilmData = await homepage.getFoundFilmData();
 
-        await browser.wait(EC.visibilityOf(inputElem));
-        inputElem.sendKeys(testData.searchFilmData.filmName);
-
-        await browser.wait(EC.elementToBeClickable(searchButton));
-        searchButton.click();
-
-        await browser.wait(EC.visibilityOf(element(By.cssContainingText('.jumbotron+div h3', 'Search Results'))));
-        await browser.wait(EC.visibilityOf($('.jumbotron+div movie-card')));
-
-        let searchResultMovie = $('.jumbotron+div movie-card');
-        let searchResultMovieName = await searchResultMovie.$('.caption h4').getText();
-        
-        let searchResultMovieReleaseDate = await searchResultMovie.$('.caption h4+p').getText();
-        searchResultMovieReleaseDate = searchResultMovieReleaseDate.split(' ')[2];
-
-        let searchResultMovieRate = await searchResultMovie.$('.caption p+p small').getText();
-
-        expect(searchResultMovieName).equal(testData.searchFilmData.filmName);
-        expect(searchResultMovieReleaseDate).equal(testData.searchFilmData.releaseDate);
-        expect(searchResultMovieRate).equal(testData.searchFilmData.filmRate);
+        expect(foundFilmData.searchResultMovieName).equal(testData.searchFilmData.filmName);
+        expect(foundFilmData.searchResultMovieReleaseDate).equal(testData.searchFilmData.releaseDate);
+        expect(foundFilmData.searchResultMovieRate).equal(testData.searchFilmData.filmRate);
     });
 });

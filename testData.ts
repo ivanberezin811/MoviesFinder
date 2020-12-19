@@ -7,7 +7,7 @@ let testData = {
     searchFilmData: {
         filmName: `Alien Xmas`,
         releaseDate: `2020-11-20`,
-        filmRate: `7.2`
+        filmRate: `7.1`
     }
 }
 
